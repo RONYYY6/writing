@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YYY5LP5LKG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YYY5LP5LKG');
+    </script>
+    <title>Word Frequency - Reduce Repetition in your Writing</title>
+    <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+    <link rel="stylesheet" href="style.css">
+    <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="description" content="A free word frequency counter built by Rohan Taneja.">
+    <meta name="keywords" content="word, frequency, counter, word counter, word frequency counter, repeated words, repeated, repeat, redundancy, repeated word counter">
+    <meta name="author" content="Rohan Taneja">
+</head>
+<body>
+    <div class="center">
+        <h1>Improve your writing</h1>
+        <p>Reduce the number of repeated words in a text with this free word frequency counter. Enter your text into the space blow to get started. Then, try typing one of the repeated words into the search box and clicking "Search" to see exactly where it is in your text.</p>
+        <br>
+        <div id="editor"></div>
+        <br>
+        <input type="submit" id="submitbutton" value="Submit" style="width: 100%;" onclick="decider()">
+        <h1 id="resultsHeader"></h1>
+        <div style="display: none;" id="search">
+            <input type="text" name="wordToHighlight" id="wordToHighlight" placeholder="Search for a word..." style="float: left;">
+            <button onclick="highlightWord()" style="float: right;">Search</button>
+        </div>
+        <table id="table">
+        </table>
+    </div>
+    
+    <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="rohant" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+    
+    <script type="text/javascript">
+        var inputText;
+        var inputTextLower;
+        var tableText = document.getElementById("table");;
+        
+        var options = {
+              modules: {
+                toolbar: false
+              },
+              theme: 'snow'
+        };
+        var quill = new Quill('#editor', options);
+    
+        function decider() {
+            quill.formatText(0, quill.getLength(), {
+                'background': false,
+            });
+            inputText = quill.getText();
+            inputTextLower = inputText.toLowerCase();
+
+            if (inputText != "\n") {
+                tableText.innerHTML = ""
+                tableText.innerHTML += "<tr><th>Word</th><th>Frequency</th></tr>"
+                textCounter();
+            } else {
+                tableText.innerHTML = ""
+                document.getElementById("resultsHeader").innerHTML = "";
+            }
+        }
+        
+        function textCounter() {
+            var pattern = /\w+/g,
+                string = inputTextLower;
+                matchedWords = string.match( pattern );
+            var counts = matchedWords.reduce(function ( stats, word ) {
+                if ( stats.hasOwnProperty( word ) ) {
+                    stats[ word ] = stats[ word ] + 1;
+                } else {
+                    stats[ word ] = 1;
+                }
+                return stats;
+            }, {} );
+            
+            let sortedCounts = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            
+            for (const count of sortedCounts) {
+                if (count[0] != "s" && count[0] != "ve") {
+                    tableText.innerHTML += `<tr><td>${count[0]}</td><td>${count[1]}</td></tr>`;
+                }
+            }
+            
+            var resultsHeader = document.getElementById("resultsHeader");
+            resultsHeader.textContent = "Results";
+            document.getElementById("search").style.display = 'flex';
+            document.getElementById("submitbutton").value = "Check again";
+        }
+        
+        function getIndicesOf(word) {
+            var wordRegex = new RegExp(word, "gi");
+            var regex = wordRegex,result,indices=[];
+            while((result=regex.exec(inputText)))
+                {
+                    indices.push(result.index);
+                }
+                return indices;
+        }
+        
+        function highlightWord() {
+            if (document.getElementById("wordToHighlight").value != "") {
+                quill.formatText(0, quill.getLength(), {
+                    'background': false
+                });
+                var wordToHighlight = document.getElementById("wordToHighlight").value;
+                wordToHighlight = wordToHighlight.toLowerCase();
+                inputText = quill.getText();
+                var wordToHighlightWithRegexWordBoundary = `\\b${wordToHighlight}\\b`
+                let re = new RegExp(wordToHighlightWithRegexWordBoundary, "gi");
+                let match = re.test(inputText);
+                if (match) {
+                   let indices = getIndicesOf(re);
+                   let length = wordToHighlight.length;
+                   indices.forEach(index =>
+                        quill.formatText(index, length, {
+                       'background': 'rgb(144,238,144)'
+                   }));
+                }
+            } else {
+                quill.formatText(0, quill.getLength(), {
+                    'background': false,
+                });
+            }
+        }
+    </script>
+</body>
+<footer>
+    <p>Made for Writers</a></p>
+</footer>
+</html>
